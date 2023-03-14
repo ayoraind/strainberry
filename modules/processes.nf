@@ -1,10 +1,11 @@
 process MINIMAP2 {
     tag "mapping of $meta assemblies"
     
+  //  publishDir "${params.output_dir}", mode:'copy'
     
-    publishDir "${params.output_dir}", mode:'copy'
+    conda '/MIGE/01_DATA/07_TOOLS_AND_SOFTWARE/nextflow_pipelines/strain_resolution/sberry_env.yml'
     
-    conda '../sberry_env.yml'
+    errorStrategy 'ignore'
     
     input:
     tuple val(meta), path(reads), path(assembly)
@@ -42,7 +43,9 @@ process STRAINBERRY {
     
     publishDir "${params.output_dir}/${meta}_FLYE_SBERRY", mode:'copy'
     
-    conda '../sberry_env.yml'
+    conda '/MIGE/01_DATA/07_TOOLS_AND_SOFTWARE/nextflow_pipelines/strain_resolution/sberry_env.yml'
+    
+    errorStrategy 'ignore'
     
     input:
     tuple val(meta), path(assembly), path(bam)

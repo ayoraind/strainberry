@@ -12,7 +12,7 @@
         Mandatory arguments:
          --reads                        Query fastqz file of sequences you wish to supply as input (e.g., "/MIGE/01_DATA/01_FASTQ/T055-8-*.fastq.gz")
          --output_dir                   Output directory (e.g., "/MIGE/01_DATA/03_ASSEMBLY")
-	 --assemblies                   Either base assembly (in this case from Flye) or error-corrected assembly (e.g. from Medaka) should be sufficient (e.g., "/MIGE/01_DATA/03_ASSEMBLY/*_FLYE/T055-8-*.fasta")
+	 --assemblies                   must be Flye assembly (e.g., "/MIGE/01_DATA/03_ASSEMBLY/*_FLYE/T055-8-*.fasta")
          
         Optional arguments:
          --help                         This usage statement.

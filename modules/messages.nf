@@ -6,7 +6,7 @@ def help_message() {
 
         Mandatory arguments:
          --reads                        Query fastqz file of sequences you wish to supply as input (e.g., "/MIGE/01_DATA/01_FASTQ/T055-8-*.fastq.gz")
-         --assemblies                   Either base assembly (in this case from Flye) or error-corrected assembly should be sufficient (e.g., "/MIGE/01_DATA/03_ASSEMBLY/*_FLYE/T055-8-*.fasta").
+         --assemblies                   must be Flye assembly (e.g., "/MIGE/01_DATA/03_ASSEMBLY/*_FLYE/T055-8-*.fasta").
          --output_dir	                Output directory
 
         Optional arguments:

@@ -3,9 +3,9 @@ process MINIMAP2 {
     
   //  publishDir "${params.output_dir}", mode:'copy'
     
-    conda '/MIGE/01_DATA/07_TOOLS_AND_SOFTWARE/nextflow_pipelines/strain_resolution/sberry_env.yml'
     
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 5 ? "retry" : "finish" }
+    maxRetries 5
     
     input:
     tuple val(meta), path(reads), path(assembly)
@@ -36,6 +36,63 @@ process MINIMAP2 {
     """
 }
 
+process MINIMAP2_SAM {
+    tag "$meta"
+
+   // publishDir "${params.output_dir}", mode:'copy'
+
+    errorStrategy { task.attempt <= 5 ? "retry" : "finish" }
+    maxRetries 5
+
+    input:
+    tuple val(meta), path(reads), path(assembly)
+
+    output:
+    tuple val(meta), path("*.sam"), emit: sam_ch
+    path "versions.yml" , emit: versions_ch
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    """
+    minimap2 -ax map-ont -t 12 $assembly $reads  > ${meta}.sam
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        minimap2: \$(minimap2 --version 2>&1)
+    END_VERSIONS
+    """
+}
+
+process SAM_SORT_AND_INDEX {
+    tag "$meta"
+
+   // publishDir "${params.output_dir}", mode:'copy'
+
+    input:
+    tuple val(meta), path(sam), path(assembly)
+
+    output:
+    tuple val(meta), path("*.bam"), path("${meta}.alignment.sorted.bam.bai"), path("${meta}.fasta.fai"), emit: bam_ch
+    path "versions.yml",                                                                                 emit: versions_ch
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    """
+
+    samtools sort $sam > ${meta}.alignment.sorted.bam
+    samtools faidx $assembly
+    samtools index -b ${meta}.alignment.sorted.bam
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
+	 END_VERSIONS
+    """
+}
 
 process STRAINBERRY {
     tag "Strain resolution of $meta assemblies"
@@ -43,14 +100,12 @@ process STRAINBERRY {
     
     publishDir "${params.output_dir}/${meta}_FLYE_SBERRY", mode:'copy'
     
-    conda '/MIGE/01_DATA/07_TOOLS_AND_SOFTWARE/nextflow_pipelines/strain_resolution/sberry_env.yml'
     
-    errorStrategy 'ignore'
+    errorStrategy { task.attempt <= 5 ? "retry" : "finish" }
+    maxRetries 5
     
     input:
-    tuple val(meta), path(assembly), path(bam)
-    path bai
-    path fai
+    tuple val(meta), path(bam), path(bai), path(fai), path(assembly)
     
     output:
     tuple val(meta), path("${meta}.fasta"), emit: first_assembly_ch

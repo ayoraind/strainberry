@@ -26,7 +26,7 @@ pipeline_start_message(version, final_params)
 
 
 // include processes
-include { MINIMAP2; STRAINBERRY } from './modules/processes.nf' addParams(final_params)
+include { MINIMAP2_SAM; SAM_SORT_AND_INDEX; STRAINBERRY } from './modules/processes.nf' addParams(final_params)
 
 
 
@@ -44,11 +44,20 @@ workflow  {
          joined_ch = read_ch.join(assemblies_ch)
 
 
-         MINIMAP2(joined_ch)
+       //  MINIMAP2(joined_ch)
 
-         joined_map_ch = assemblies_ch.join(MINIMAP2.out.bam_ch)
+        // joined_map_ch = assemblies_ch.join(MINIMAP2.out.bam_ch)
+	 
+	 MINIMAP2_SAM ( joined_ch )
+	 
+	 joined_sam_ch = MINIMAP2_SAM.out.sam_ch.join(assemblies_ch)
 
-         STRAINBERRY(joined_map_ch, MINIMAP2.out.bai_ch, MINIMAP2.out.fai_ch)
+         SAM_SORT_AND_INDEX(joined_sam_ch)
+	 
+	 joined_sam_assembly_ch = SAM_SORT_AND_INDEX.out.bam_ch.join(assemblies_ch)
+
+
+         STRAINBERRY(joined_sam_assembly_ch)
 
 }
 

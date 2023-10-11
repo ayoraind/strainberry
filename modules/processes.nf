@@ -109,6 +109,8 @@ process STRAINBERRY {
     
     output:
     tuple val(meta), path("${meta}.fasta"), emit: first_assembly_ch
+    tuple val(meta), path("${meta}.log"),   emit: log_ch 
+    path("*.logsummary"),                   emit: log_summary_ch
     path "versions.yml"                   , emit: versions_ch
 
     when:
@@ -120,15 +122,49 @@ process STRAINBERRY {
     """
     # strain resolution
           
-     strainberry $args -r $assembly -b $bam -c $task.cpus -o sberry_out
+     strainberry $args -r $assembly -b $bam -c $task.cpus --nanopore -o sberry_out &> ${meta}.log
     
      mv sberry_out/assembly.scaffolds.fa ${prefix}.fasta
     
     sed -i "s/^>/>${prefix}_/g" ${prefix}.fasta
     
+    # summarize log file
+    log_summary.sh ${meta}
+    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         strainberry: \$( strainberry --version 2>&1 | sed 's/Strainberry //g' )
     END_VERSIONS
+    """
+}
+
+
+process COMBINE_LOG_SUMMARY {
+    publishDir "${params.output_dir}", mode:'copy'
+    tag { 'combine log summary files'} 
+    
+    
+    input:
+    path(log_summary_files)
+    
+
+    output:
+    path("combined_log_summary.txt"), emit: combined_log_summary_ch
+
+    
+    script:
+    """ 
+    LOG_SUMMARY_FILES=(${log_summary_files})
+    
+    for index in \${!LOG_SUMMARY_FILES[@]}; do
+    LOG_SUMMARY_FILE=\${LOG_SUMMARY_FILES[\$index]}
+    
+    # add header line if first file
+    if [[ \$index -eq 0 ]]; then
+      echo "\$(head -1 \${LOG_SUMMARY_FILE})" >> combined_log_summary.txt
+    fi
+    echo "\$(awk 'FNR==2 {print}' \${LOG_SUMMARY_FILE})" >> combined_log_summary.txt
+    done
+
     """
 }

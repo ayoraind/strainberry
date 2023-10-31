@@ -32,6 +32,9 @@ An example of a command to run this pipeline is:
 nextflow run main.nf --reads "Sample_files/*.fastq.gz" --output_dir "test2" --assemblies "*.fasta"
 ```
 
+To extract strain-resolved genomes from the assemblies and generate other useful statistics report, kindly follow the steps outlined [here](https://github.com/ayoraind/strainberry-accessories).
+
+
 ## Word of Note
 This is an ongoing project at the Microbial Genome Analysis Group, Institute for Infection Prevention and Hospital Epidemiology, Üniversitätsklinikum, Freiburg. The project is funded by BMBF, Germany, and is led by [Dr. Sandra Reuter](https://www.uniklinik-freiburg.de/iuk-en/infection-prevention-and-hospital-epidemiology/research-group-reuter.html).
 

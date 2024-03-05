@@ -22,7 +22,7 @@
 
 
 ## Introduction
-This pipeline attempts to resolve strains from long-read assemblies. This Nextflow pipeline was adapted from the original author's [github page](https://github.com/rvicedomini/strainberry).  
+This pipeline attempts to resolve strains from long-read assemblies. This Nextflow pipeline was adapted from the original author's [Github page](https://github.com/rvicedomini/strainberry).  
 
 
 ## Sample command

@@ -101,7 +101,7 @@ process STRAINBERRY {
     publishDir "${params.output_dir}/${meta}_FLYE_SBERRY", mode:'copy'
     
     
-    errorStrategy { task.attempt <= 5 ? "retry" : "finish" }
+    errorStrategy { task.attempt <= 5 ? "retry" : "ignore" }
     maxRetries 5
     
     input:

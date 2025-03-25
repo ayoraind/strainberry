@@ -24,7 +24,7 @@ process MINIMAP2 {
     def prefix = task.ext.prefix ?: "${meta}"
     """
     # mapping
-     minimap2 -ax map-ont -t $task.cpus $assembly $reads | samtools sort > ${prefix}.alignment.sorted.bam
+     minimap2 -ax map-ont -t 1 $assembly $reads | samtools sort > ${prefix}.alignment.sorted.bam
      samtools faidx $assembly
      samtools index -b ${prefix}.alignment.sorted.bam
      
@@ -56,7 +56,7 @@ process MINIMAP2_SAM {
 
     script:
     """
-    minimap2 -ax map-ont -t 12 $assembly $reads  > ${meta}.sam
+    minimap2 -ax map-ont -t 1 $assembly $reads  > ${meta}.sam
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -122,7 +122,7 @@ process STRAINBERRY {
     """
     # strain resolution
           
-     strainberry $args -r $assembly -b $bam -c $task.cpus --nanopore -o sberry_out &> ${meta}.log
+     strainberry $args -r $assembly -b $bam -c 1 --nanopore -o sberry_out &> ${meta}.log
     
      mv sberry_out/assembly.scaffolds.fa ${prefix}.fasta
     
